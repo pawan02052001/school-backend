@@ -7,6 +7,7 @@ import studentRoutes from './routes/student.js';
 
 dotenv.config();
 
+
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -36,6 +37,6 @@ app.get('/api/data/:schema/:tableName', async (req, res) => {
   }
 });
 
-app.listen(port, () => {
+app.listen(port,'0.0.0.0', () => {
   console.log(`🚀 Server running on http://localhost:${port}`);
 });
