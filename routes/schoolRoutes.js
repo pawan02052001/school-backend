@@ -1,4 +1,6 @@
+// routes/school.js
 import express from 'express';
+import { authenticateToken, adminOnly } from '../middleware/auth.js';
 import {
   getAllSchools,
   getSchoolById,
@@ -9,10 +11,10 @@ import {
 
 const router = express.Router();
 
-router.get('/', getAllSchools);
-router.get('/:id', getSchoolById);
-router.post('/', createSchool);
-router.put('/:id', updateSchool);
-router.delete('/:id', deleteSchool);
+router.get('/', authenticateToken, getAllSchools);
+router.get('/:id', authenticateToken, getSchoolById);
+router.post('/', authenticateToken, adminOnly, createSchool);
+router.put('/:id', authenticateToken, adminOnly, updateSchool);
+router.delete('/:id', authenticateToken, adminOnly, deleteSchool);
 
 export default router;

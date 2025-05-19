@@ -1,7 +1,9 @@
-import pool from '../config/db.js';
+// controllers/schoolController.js
+import connectToDb from '../config/db.js';
 
 export const getAllSchools = async (req, res) => {
   try {
+    const pool = await connectToDb();
     const result = await pool.request().query('SELECT * FROM schools');
     res.json(result.recordset);
   } catch (err) {
@@ -11,6 +13,7 @@ export const getAllSchools = async (req, res) => {
 
 export const getSchoolById = async (req, res) => {
   try {
+    const pool = await connectToDb();
     const result = await pool
       .request()
       .input('id', req.params.id)
@@ -24,6 +27,7 @@ export const getSchoolById = async (req, res) => {
 export const createSchool = async (req, res) => {
   try {
     const { name, address, phone } = req.body;
+    const pool = await connectToDb();
     const result = await pool
       .request()
       .input('name', name)
@@ -40,6 +44,7 @@ export const updateSchool = async (req, res) => {
   try {
     const { name, address, phone } = req.body;
     const { id } = req.params;
+    const pool = await connectToDb();
     await pool
       .request()
       .input('name', name)
@@ -56,6 +61,7 @@ export const updateSchool = async (req, res) => {
 export const deleteSchool = async (req, res) => {
   try {
     const { id } = req.params;
+    const pool = await connectToDb();
     await pool.request().input('id', id).query('DELETE FROM schools WHERE id = @id');
     res.json({ message: 'School deleted successfully' });
   } catch (err) {
