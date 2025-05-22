@@ -1,4 +1,3 @@
-// routes/student.js
 import express from 'express';
 import sql from 'mssql';
 import { authenticateToken, adminOnly, studentOnly } from '../middleware/auth.js';

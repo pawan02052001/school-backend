@@ -29,3 +29,12 @@ export const adminOnly = (req, res, next) => {
   }
   next();
 };
+
+export const studentOnly = (req, res, next) => {
+  console.log('StudentOnly - User Role:', req.user.role);
+  if (req.user.role !== 'student') {
+    console.log('StudentOnly - Error: Student access required for:', req.user.userId);
+    return res.status(403).json({ error: 'Student access required' });
+  }
+  next();
+};

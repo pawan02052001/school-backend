@@ -16,15 +16,20 @@ const port = process.env.PORT || 3000;
 app.use(cors()); // Relaxed CORS for testing
 app.use(express.json());
 
-// Rate limiting for security
+// Rate limiting for security (applied globally)
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP to 100 requests per window
 });
-app.use('/api/auth', limiter);
+app.use('/api', limiter); // Apply to all /api routes
+
+// Health check endpoint for Railway
+app.get('/health', (req, res) => {
+  res.status(200).json({ message: 'Server is running' });
+});
 
 // Routes
-console.log('Mounting routes...'); // Debug log
+console.log('Mounting routes...');
 app.use('/api/auth', authRoutes);
 app.use('/api', studentRoutes);
 app.use('/api/dbmeta', dbMetaRoutes);
@@ -48,6 +53,36 @@ app.get('/api/data/:schema/:tableName', async (req, res) => {
   }
 });
 
+// Global error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Unhandled Error:', err.message, err.stack);
+  res.status(500).json({ error: 'Something went wrong', details: err.message });
+});
+
+// Test database connection on startup
+(async () => {
+  try {
+    await connectToDb();
+    console.log('Database connected successfully');
+  } catch (err) {
+    console.error('Failed to connect to database on startup:', err.message, err.stack);
+    process.exit(1); // Exit if DB connection fails
+  }
+})();
+
+// Start server
 app.listen(port, '0.0.0.0', () => {
   console.log(`🚀 Server running on http://localhost:${port}`);
+});
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err.message, err.stack);
+  process.exit(1);
+});
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  process.exit(1);
 });
